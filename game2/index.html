@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#mycanvas{
+				display: block;
+				margin: 20px auto;
+				 background: url(img/b-5.png);
+				 background-size: 100% 100%;
+			}
+		</style>
+	</head>
+	<body>
+	   <canvas id="mycanvas" width="1200" height="800"></canvas>
+	   <script>
+		var cv=document.querySelector('canvas')
+		var ctx=cv.getContext('2d');
+		var pao=new Image();
+		pao.src='img/gun.png';
+		var bull=new Image();
+		bull.src='img/0.png';
+		var f1= new Image();
+		f1.src='img/1.png';
+		var f2= new Image();
+		f2.src='img/2.png';
+		var f3= new Image();
+		f3.src='img/3.png';
+		var f4= new Image();
+		f4.src='img/4.png';
+		var f5= new Image();
+		f5.src='img/5.png';
+		var f6= new Image();
+		f6.src='img/2.png';
+		var f7= new Image();
+		f7.src='img/7.png';
+		var f8= new Image();
+		f8.src='img/8.png';
+		var f9= new Image();
+		f9.src='img/9.png';
+		var f10= new Image();
+		f10.src='img/10.png';
+		var f11= new Image();
+		f11.src='img/11.png';
+		var f12= new Image();
+		f12.src='img/12.png';
+		var f13= new Image();
+		f13.src='img/13.png';
+		var f14= new Image();
+		f14.src='img/14.png';
+		var f15= new Image();
+		f15.src='img/6.png';
+	var fishKinArr=[f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14];
+	var snum=0;
+	function rn(min,max){
+              	return Math.round(Math.random()*(max-min)+min)
+        };
+		pao.onload=function(){
+			ctx.beginPath();
+			ctx.drawImage(pao,cv.width/2-50,cv.height-110,100,100)
+			ctx.fill();
+		}
+			
+		//炮
+		var Arrow=function () {
+			this.x=cv.width/2; 
+			this.y=cv.height-50;
+			this.rolation=hd;
+		} 
+		Arrow.prototype.draw=function () {
+			ctx.save();
+			ctx.translate(this.x,this.y);
+			ctx.rotate(this.rolation-30);
+			ctx.beginPath();
+			ctx.drawImage(pao,-50,-50,100,100)
+			ctx.closePath()
+			ctx.fill();
+			ctx.restore();
+		}
+		//炮弹
+		var Pd=function(x,y,vx,vy,size){
+			this.x=x;
+			this.y=y;
+			this.vx=vx;
+			this.vy=vy;
+			this.startX= iCx;
+            this.startY= iCy;
+            this. iRatio=0;
+			this.size=size;
+			this.rolation=hd;
+		}
+		Pd.prototype.move=function(){
+			var theY = Math.floor(  this.size*2- Math.cos(this.rolation-30) *  this.size);
+	        var theX = Math.ceil(Math.sin(this.rolation-30) *  this.size);
+	        var arcX = this.x+theX;
+	        var arcY =  this.y+theY;
+	        this. iRatio= (this.startX - arcX) / (this.startY - arcY);
+	        ctx.save();
+	        ctx.translate(this.x, this.y);//设置原点
+            ctx.rotate(this.rolation-30);
+            ctx.beginPath();
+            ctx.drawImage(bull,theX-23, theY-150 , this.size, this.size*2);
+            ctx.restore();
+			this.x-=this.vx*this. iRatio.toFixed(1);
+			this.y-=this.vy;
+			if(this. iRatio.toFixed(1)>=3||this. iRatio.toFixed(1)<=-3){
+//				this.vx=2;
+//				this.vy=0;
+           }
+			if(this.x<0||this.x>cv.width||this.y<0||this.y>cv.height){
+				pdArr.shift();
+			}
+			ctx.fill();
+		};
+			
+		var hd;
+		var pdArr=[]//炮弹数组
+		var Arrow=new Arrow();
+		function drawFram(){
+			var dx=c_x-Arrow.x;
+			var dy=c_y-Arrow.y;
+			hd=Math.atan2(dy,dx);
+			//旋转炮体
+	 		Arrow.rolation=hd;
+	 		Arrow.draw()
+	 }
+		
+	function Fish(x,y,vx,vy,bg,size){
+		this.x=x;
+		this.y=y;
+		this.vx=vx;
+		this.vy=vy;
+		this.bg=bg;
+		this.size=size;
+		this.rolation=0;
+		this.collR=40;
+	}
+	Fish.prototype.move=function(){
+		if(this.vy>0&&this.vx>0){
+			this.rolation=Math.atan2(cv.height,cv.width);
+		} else if(this.vy<0&&this.vx>0){
+			this.rolation=Math.atan2(-cv.height,cv.width);
+		} else if(this.vx<0&&this.vy>0){
+			this.rolation=Math.atan2(-cv.height,cv.width);
+		} else if(this.vx<0&&this.vy<0){
+			this.rolation=Math.atan2(cv.height,cv.width);
+		}
+			ctx.save();
+			ctx.beginPath();
+			ctx.translate(this.x,this.y);
+			ctx.rotate(this.rolation);
+			ctx.drawImage(this.bg,this.x,this.y,this.size*1.3,this.size);
+			this.x+=this.vx;
+			this.y+=this.vy;
+			if(this.x>=cv.width+250||this.y<=-250||this.y>=cv.height+250|| this.x<=-300){
+				var index =fishArr.indexOf(this);
+				fishArr.splice(index,1);
+			}
+			ctx.restore();
+			ctx.fill();
+		
+	};
+	
+	Fish.prototype.isIn=function(x,y){
+    var a=this.x-x;
+    var b=this.y-y;
+    var c=Math.sqrt(a*a+b*b);
+    if(c<=this.collR){
+        return true;
+    }else{
+        return false;
+    }
+};
+		
+		var fishArr=[];
+		var fishnum=6;
+		//创建一个鱼
+	function createFishL(){
+		var x=-100;
+		var y=rn(-200,cv.height-120);
+		var vx=2-Math.random().toFixed(1);
+		var vy=Number(Math.random().toFixed(1));
+		if(y>cv.height/2){
+			vy=-vy;
+		}
+		var a=rn(1,13);
+		size=rn(100,150);
+		fk=fishKinArr[a];
+		var fish=new Fish(x,y,vx,vy,fk,size);
+		fishArr.unshift(fish);
+	}
+	
+	
+		
+			//创建一个鱼
+	function createFishR(){
+		var x=cv.width+200;
+		var y=rn(0,cv.height-120);
+		var vx=-(2-Math.random().toFixed(1));
+		var vy=Number(Math.random().toFixed(1));
+		if(y>cv.height/2){
+			vy=-vy;
+		}
+		size=rn(100,120);
+		var f=new Fish(x,y,vx,vy,f15,size);
+
+		fishArr.push(f);
+	}
+	function creatFkind(){
+			for(var j=0;j<fishnum;j++){
+				createFishL();
+				createFishR();
+			}
+		}	
+		
+		//金币
+		var gold=new Image();
+		gold.src='img/gold.png';
+		var box=new Image();
+		box.src='img/gold-x.png';
+		var  goldArr=[];
+		
+		function Money(x,y){
+			this.x=x;
+			this.y=y;
+			this.a=0;
+			this.ra=function(){
+				var x = Math.abs(60-this.x);
+				var y = Math.abs(cv.height-120-this.y);
+		        var z = Math.sqrt(Math.pow(x,2)+Math.pow(y,2));
+		        var cos = y/z;
+		        var radina = Math.acos(cos);//用反三角函数求弧度
+		        var angle = Math.floor(180/(Math.PI/radina));//将弧度转换成角度
+		        return angle;
+			}
+		};
+	Money.prototype.move=function(){
+		this.a++;
+		var angle=this.ra();
+//		console.log(angle)
+		ctx.beginPath();
+		ctx.drawImage(gold,this.x-40,this.y-40,90,90);
+		if(this.a%30==0){
+			this.x=220;
+			this.y=cv.height-50;
+		}
+//		this.x-=10*Math.cos(90-angle);
+//		this.y+=10*Math.sin(angle);
+		if(this.x<240||this.y>cv.height){
+			var index=goldArr.indexOf(this);
+			goldArr.splice(index,1);
+		}
+		ctx.fill();
+	};
+		
+function  createBox(){
+	ctx.beginPath();
+	ctx.drawImage(box,0,cv.height-100,150,100);
+	ctx.fill();
+}
+	 createBox();	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	//碰撞检测
+
+	function createHit(){
+		
+	for(var i=0;i<fishArr.length;i++){
+		for(var j=0;j<pdArr.length;j++){
+			  if(fishArr[i].isIn(pdArr[j].x, pdArr[j].y)){
+				var f=fishArr[i];
+						fishArr.splice(i,1);
+						pdArr.splice(j,1);
+						snum+=10;
+                         var g=new Money(f.x,f.y);
+                         goldArr.push(g);
+                          break;
+				}
+			}
+		}	
+		
+		
+		for(var f=0;f<fishArr.length;f++){
+                if(fishArr[f].x<-200 || fishArr[f].x>(cv.width+200) || fishArr[f].y<0 || fishArr[f].y>(cv.height+200)){
+                    fishArr.splice(i,1);
+                    i--;
+                }
+            }
+		window.requestAnimationFrame(createHit);
+	}
+		createHit();
+		creatFkind();
+		var hz=0;
+		function test (){
+							hz++;
+							if(hz%1200==0){
+								creatFkind();
+							}
+						ctx.clearRect(0,0,cv.width,cv.height);
+						   for( var f in fishArr){
+//						   		console.log(fishArr);
+						   	fishArr[f].move();
+						   }
+						   for(var p in pdArr){
+						   	pdArr[p].move();
+						   	
+						   }
+						   for( var m in goldArr){
+						   	goldArr[m].move();
+						   }
+//						     createHit();
+						     createBox();
+						     ctx.beginPath();
+							ctx.fillStyle='yellow';
+							ctx.font='50px Aria';
+							ctx.textAlign='center';
+							ctx.textBaseline="middle";
+						 	ctx.fillText('您的财富：'+snum,cv.width/2,40);
+						 	ctx.fill();
+			              //绘制炮台
+						drawFram();
+			window.requestAnimationFrame(test);
+		}
+		
+		
+	
+	
+				test();
+		prompt()
+		var c_x,c_y; //相对于canvas坐标的位置；
+		var iCx,iCy;
+		var nn=1 ;
+		var flag=true;
+	cv.onmousemove=function(e){
+				var e=e||window.event;
+				var x,y;
+				x=e.clientX;
+				y=e.clientY;
+				iCx=e.offsetX;
+				iCy=e.offsetY;
+				c_x=e.clientX-cv.offsetLeft;
+				c_y=e.clientY-cv.offsetTop;
+		cv.onclick=function(){
+			nn++;
+             if(nn%2==0){
+             		var p =new Pd(cv.width/2,cv.height-90,4,4,50);
+					pdArr.push(p);	
+             }		
+		}
+	}
+	   </script>
+	</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			#mycanvas{
+				display: block;
+				margin: 20px auto;
+				 background: url(img/b-5.png);
+				 background-size: 100% 100%;
+			}
+		</style>
+	</head>
+	<body>
+	   <canvas id="mycanvas" width="1200" height="800"></canvas>
+	   <script  src="js/public.js"> </script>
+	   <script>
+		var cv=document.querySelector('canvas')
+		var ctx=cv.getContext('2d');
+		var pnum=1;//炮台等级
+		var bulletArr=[];//炮弹数组
+		var flagp=true;
+		var fishArr=[];//鱼数组
+		
+		var moneyNum=999;//初始金钱
+		var webArr=[];//网数组
+		var coinArr=[];//金币数组
+		var hs=10;
+		var energy=0;
+		var superArr=[];
+		loadImage(resource,function(){   
+        if(moneyNum%1000==0){
+        	bos+=moneyNum%1000;
+        }
+		//炮
+		var hd;
+		var hd1;
+		var bos=10;//控制大鱼出现
+		var Arrow=function (type) {
+			this.type=type;
+			this.x=cv.width/2+60; 
+			this.y=cv.height-60;
+			this.cur=0;
+			this.rolation=hd;
+		} 
+		Arrow.prototype.draw=function () {
+			ctx.save();
+			ctx.translate(this.x,this.y);
+			ctx.rotate(this.rolation-30);
+			var h=cannon[this.type].h;
+//			ctx.rotate(d2a(this.rotate));
+			ctx.beginPath();
+			ctx.drawImage(JSON['cannon'+this.type],0,this.cur*h,74,74,-50,-40,100,100);
+			ctx.closePath();
+			ctx.fill();
+			ctx.restore();
+		}
+
+		var Arrow=new Arrow(1);
+		function drawFram(){
+			var dx=c_x-Arrow.x;
+			var dy=c_y-Arrow.y;
+			hd=Math.atan2(dy,dx);
+//		 	hd=90-a2d(Math.atan2(dy,dx));
+			//旋转炮体
+	 		Arrow.rolation=hd;
+	 		Arrow.draw();
+	 		
+	 }
+		
+		function Hcoin(){
+			this.x=0;
+			this.y=0;
+			this.score=0;
+		}
+		Hcoin.prototype.draw=function(){
+			
+			var sn=String(this.score);
+			var s1=sn.split('');
+			var n1=0,n2=0,n3=0;
+			switch (s1.length){
+				case 1:
+					     n1=s1[0];
+					     ctx.drawImage(JSON['coinText'],36*n1,0,38,50,this.x,this.y,45,45);
+					     break;
+				case 2:
+					     n1=s1[0];
+					     n2=s1[1];
+					  	 ctx.drawImage(JSON['coinText'],36*n1,0,38,50,this.x,this.y,45,45);
+	 					 ctx.drawImage(JSON['coinText'],36*n2,0,38,50,this.x+40,this.y,45,45);
+					     break;
+				case 3:
+					     n1=s1[0];
+					     n2=s1[1];
+					     n3=s1[2];
+					     	ctx.drawImage(JSON['coinText'],36*n1,0,38,50,this.x,this.y,45,45);
+	 					 	ctx.drawImage(JSON['coinText'],36*n2,0,38,50,this.x+40,this.y,45,45);
+					 	 	ctx.drawImage(JSON['coinText'],36*n3,0,38,50,this.x+80,this.y,45,45);
+					     break;
+				}
+			ctx.beginPath();
+//			ctx.fillRect(n1*100,n2*20,100,100);
+		
+		ctx.fill();
+		};
+	function  createInfo(ctx){
+		var sn=String(moneyNum);
+		var s1=sn.split('');
+		var n1=0,n2=0,n3=0,n4=0,n5=0,n6=0;
+		switch (s1.length){
+			case 1:
+				     n1=0;
+				     n2=0;
+				     n3=0;
+				     n4=0;
+				     n5=0;
+				     n6=s1[0];
+				     break;
+			case 2:
+				      n1=0;
+				     n2=0;
+				     n3=0;
+				     n4=0;
+				     n5=s1[0];
+				     n6=s1[1];
+				     break;
+			case 3:
+				      n1=0;
+				     n2=0;
+				     n3=0;
+				     n4=s1[0];
+				     n5=s1[1];
+				     n6=s1[2];
+				     break;
+			 case 4:
+				       n1=0;
+				     n2=0;
+				     n3=s1[0];
+				     n4=s1[1];
+				     n5=s1[2];
+				     n6=s1[3];
+				     break;
+			 case 5:
+				      n1=0;
+				     n2=s1[0];
+				     n3=s1[1];
+				     n4=s1[2];
+				     n5=s1[3];
+				     n6=s1[4];
+				     break;
+			case 6:
+			     	  n1=s1[0];
+				     n2=s1[1];
+				     n3=s1[2];
+				     n4=s1[3];
+				     n5=s1[4];
+				     n6=s1[5];
+			     	break;
+			
+		}
+	 		ctx.drawImage(JSON['bottom-bar'],0,cv.height-99,cv.width-10,100);
+	 		ctx.drawImage(JSON['cannon_minus'],cv.width/2+110,cv.height-37,30,30);
+	 		ctx.drawImage(JSON['cannon_plus'],cv.width/2-10,cv.height-37,30,30);
+          	ctx.drawImage(JSON['energy-bar'],cv.width/2+246,cv.height-38,energy,28);
+	 		ctx.drawImage(JSON['number_black'],0,218-24*n1,22,22,30,cv.height-35,30,30);
+	 		ctx.drawImage(JSON['number_black'],0,218-24*n2,22,22,65,cv.height-35,30,30);
+	 		ctx.drawImage(JSON['number_black'],0,218-24*n3,22,22,105,cv.height-35,30,30);
+	 		ctx.drawImage(JSON['number_black'],0,218-24*n4,22,22,140,cv.height-35,30,30);
+	 		ctx.drawImage(JSON['number_black'],0,218-24*n5,22,22,175,cv.height-35,30,30);
+	 		ctx.drawImage(JSON['number_black'],0,218-24*n6,22,22,210,cv.height-35,30,30);
+	 		ctx.drawImage(JSON['super'],cv.width-70,cv.height-100,50,50);
+	}
+	
+	
+	function Super(){
+		this.x=0;
+		this.y=0;
+		this.vx=10;
+	}
+	Super.prototype.move=function(){
+		ctx.beginPath();
+		ctx.lineWidth=10;
+		ctx.strokeStyle='#00BFFF';
+		ctx.fillRect(this.x,0,18,cv.height);
+		if(this.x>cv.width+20){
+			superArr.shift();
+			flags=false;
+		}
+		this.x+=this.vx;
+		this.y+=this.vy;
+		ctx.fill();
+	};
+	
+	
+   //炮弹
+		function Bullet(type){
+             this.type=type;
+		    this.x=0;
+		    this.y=0;
+		    this.rotate=0;
+		    this.rotate1=0;
+		    this.iSpeed=this.type*2;
+		};
+		Bullet.prototype.move=function(){
+			 var w=bullet[this.type].w;
+		   	 var h=bullet[this.type].h;
+		    var x=bullet[this.type].x;
+		    var y=bullet[this.type].y;
+		    ctx.save();
+		    ctx.translate(this.x,this.y);
+		     ctx.rotate( this.rotate1-30);
+		    ctx.drawImage(JSON['bullet'],x,y,w,h,-w/2,-h/2,w,h);
+		     if(this.y*Math.cos(d2a(this.rotate))<0|| this.x<0||this.x>cv.width){
+		     	 var index=bulletArr.indexOf(this);
+		     	 bulletArr.splice(index,1);
+		     }
+		   this.x+=Math.sin(d2a(this.rotate))*this.iSpeed;
+          	this.y-=Math.cos(d2a(this.rotate))*this.iSpeed;
+		    ctx.restore();
+		};
+     
+     //鱼
+     function  FIsh(type){
+     	this.type=type;
+	    this.x=0;
+	    this.y=0;
+	    this.cur=0;
+	    this.rotate=0;
+	    this.iSpeed=1;
+	    this.life=this.type*3;
+	    this.collR=fishKind[this.type].collR;
+     }
+      FIsh.prototype.move=function(){
+      	var w=fishKind[this.type].w;
+    	var h=fishKind[this.type].h;
+	    ctx.save();
+	    ctx.translate(this.x,this.y);
+	    ctx.rotate(d2a(this.rotate));
+	      if(this.rotate>90 && this.rotate<270){
+        	ctx.scale(1,-1);
+ 	   }
+	 ctx.drawImage(JSON['fish'+this.type],0,h*this.cur,w,h, -w/2,-h/2,w,h);
+    ctx.restore();
+    this.x+=Math.cos(d2a(this.rotate))*this.iSpeed;
+    this.y+=Math.sin(d2a(this.rotate))*this.iSpeed;
+     if( this.type>12){
+        	 this.x-=2*Math.cos(d2a(this.rotate))*this.iSpeed;
+        	  this.y-=2*Math.sin(d2a(this.rotate))*this.iSpeed;
+       }
+     if(this.x>cv.width+100||this.x<-100||this.y<-100||this.y>cv.height){
+     	var index= fishArr.indexOf(this);
+     	fishArr.splice(index,1);
+     }
+  if(Math.round(this.x)%hs==0){
+  	 this.cur++;
+        if(this.cur==4){
+            this.cur=0;
+        }
+  }
+  		 
+     };
+     //检测子弹与鱼的位置
+FIsh.prototype.isIn=function(x,y){
+    var a=this.x-x;
+    var b=this.y-y;
+    var c=Math.sqrt(a*a+b*b);
+    if(c<=this.collR){
+        return true;
+    }else{
+        return false;
+    }
+};
+//创建一个鱼
+  function createFish(){
+  	var  fang=Math.random().toFixed(1);
+  	if(fang>0.6){
+  		 var type=rn(1,bos);
+  	     var f= new FIsh(type);
+  	     f.x=-100;
+  	     f.y=rn(0,cv.height);
+  	      f.rotate=rn(-89,89);
+  	     fishArr.push(f);
+  	} else {
+//		var type = 13;
+		 var type=rn(1,bos);
+  	     var f= new FIsh(type);
+  	     f.x=cv.width+100;
+  	     f.y=rn(0,cv.height);
+  	      f.rotate=rn(91,296);
+  	      if(type>12){
+  	      	 f.rotate=rn(-89,89);
+  	      }
+  	     fishArr.push(f);
+  	}
+  	    
+  }
+
+   createFish();
+   
+   
+   function Web(){
+  	  this.type=3;
+   	      this.x=0;
+   	      this.y=0;
+   	      this.scale=1;
+   }
+   Web.prototype.draw=function(){
+    var x=web[this.type].x;
+    var y=web[this.type].y;
+    var w=web[this.type].w;
+    var h=web[this.type].h;
+       	ctx.fill();
+     ctx.save();
+    ctx.translate(this.x,this.y);
+    ctx.scale(this.scale,this.scale);
+   	ctx.drawImage(JSON['web'],x,y,w,h,-x/2,-y/2,150,150);
+   	ctx.restore();
+   };
+   
+   function Coin(type){
+   	 this.type=type;
+    this.x=0;
+    this.y=0;
+    this.cur=0;
+   }
+   Coin.prototype.draw=function(){
+   	ctx.save();
+    ctx.translate(this.x,this.y);
+    if(this.type<3){
+        ctx.drawImage(JSON['coinAni1'], 0,this.cur*60,60,60, -30,-30,60,60 );
+    }else{
+        ctx.drawImage(JSON['coinAni2'],0,this.cur*60,60,60,-30,-30,60,60);
+    }
+    this.x+=-this.x/10;
+        this.y+=(730-this.y)/10;
+        this.cur++;
+        if(this.cur==10){
+            this.cur=0;
+        }
+    ctx.restore();
+   };
+   
+   
+
+   
+   //碰撞检测
+   var HcArr=[];
+   function  createHit(){
+   	for(var i=0;i<fishArr.length;i++){
+  	 	for(var j=0;j<bulletArr.length;j++){
+   			if(fishArr[i].isIn(bulletArr[j].x,bulletArr[j].y)){
+   				var dis =Math.random();
+   				if(dis>0.9-Arrow.type*0.1){
+   					  fishArr[i].life= fishArr[i].life-Arrow.type*2;
+   					  if( fishArr[i].life<=0){
+	   				 var coin = new Coin();
+	   				 var h1= new Hcoin();
+	   				  h1.x=fishArr[i].x;
+	          		  h1.y=fishArr[i].y;
+	          		 h1.score=fishArr[i].type*10;
+	                  coin.x=fishArr[i].x;
+	                  coin.y=fishArr[i].y;
+	                  coin.type=fishArr[i].type;
+	                  coinArr.push(coin);
+	                  HcArr.push(h1);
+	   			   	 fishArr.splice(i,1);
+	   			   	 if(fishArr[i].type>10){
+	   			   	 	console.log(1);
+	   			   	 	moneyNum+= fishArr[i].type*100;
+	   			   	 } else {
+	   			   	 	moneyNum+= fishArr[i].type*10;
+	   			   	 }
+	   			   
+	   			   	if(moneyNum>2000){
+			        	bos=bos+1;
+			        	console.log(bos);
+			        }
+	   			   	energy+=fishArr[i].type*3;
+	   			   	if(energy>=330){
+	   			   		energy=330;
+	   			   		var s= new Super();
+			  		superArr.push(s);
+	   			   	}
+   				}
+   			 }
+   				var web=new Web();
+   				 		web.x=fishArr[i].x;
+	                  	web.y=fishArr[i].y;
+   					 	bulletArr.splice(j,1);
+   					  webArr.push(web);
+   					moneyNum+=Arrow.type*1;
+                    break;
+   			}
+   		}
+   	}
+   }
+   var s= new Super();
+	superArr.push(s);
+	var flags=true;
+	function superM() {
+	  for( var s in superArr){
+		 superArr[s].move();
+		  
+	  }
+	   HitS();
+	   if(flags){
+	   	window.requestAnimationFrame(superM);
+	   }
+		
+	 }
+	
+	function HitS(){
+	   	for(var i=0;i<fishArr.length;i++){
+	  	 	for(var j=0;j<superArr.length;j++){
+	  	 		if(fishArr[i].x<=superArr[0].x){
+	   			// if(fishArr[i].isIn(superArr[0].x+20,superArr[0].y+20)){
+	   				 	moneyNum+= fishArr[i].type*10;
+	   					 var coin = new Coin();
+		                  coin.x=fishArr[i].x;
+		                  coin.y=fishArr[i].y;
+		                  coin.type=fishArr[i].type;
+		                  coinArr.push(coin);
+		   			   	 fishArr.splice(i,1);
+		   			  break;
+	   			}
+	   		}
+	   	}
+   }
+		var hz=0;
+		function test (){
+			hz++;
+		ctx.clearRect(0,0,cv.width,cv.height);
+		    if(moneyNum>1000){
+		    	bos=11;
+		    }
+		     if(moneyNum>2000){
+		    	bos=12;
+		    }
+		 for(var j in  fishArr){
+		 	fishArr[j].move();
+		 }
+		  if(hz%30==0){
+		  	 createFish();
+		  }
+ 
+		   createInfo(ctx);
+		  if(flagp){
+			  	 for( var i in bulletArr){
+			  	bulletArr[i].move();
+			  }
+		  }
+		  for( var c in coinArr){
+		  	coinArr[c].draw();
+		  }
+		 if(hz%10==0){
+		 	webArr.shift();
+		 	
+		 }
+		  if(hz%30==0){
+		 	coinArr.shift();
+		 	HcArr.shift();
+		 }
+		  createHit();
+		 
+		  for( var w in webArr){
+		  	webArr[w].draw();
+		  }
+		  
+		  for (var d in HcArr){
+		  	HcArr[d].draw();
+		  }
+          //绘制炮台
+		drawFram();
+			window.requestAnimationFrame(test);
+		}
+test();
+		
+		var c_x,c_y; //相对于canvas坐标的位置；
+		var iCx,iCy;
+		var nn=1 ;
+		var flag=true;
+	cv.onmousemove=function(e){
+				var e=e||window.event;
+				var x,y;
+				x=e.clientX;
+				y=e.clientY;
+				iCx=e.offsetX;
+				iCy=e.offsetY;
+				c_x=e.clientX-cv.offsetLeft;
+				c_y=e.clientY-cv.offsetTop;
+				var x=c_x- Arrow.x;
+	           var y= Arrow.y-(c_y);
+	           var d=90-a2d(Math.atan2(y,x));
+	           if(c_x>=710&&c_x<=740&&c_y>=763&&c_y<=793){flagp=false} else {flagp=true;}
+	           	if(c_x>=590&&c_x<=620&&c_y>=763&&c_y<=793){flagp=false}  else {flagp=true;}
+		cv.onclick=function(){
+			 if(moneyNum>0){
+					 	var bullet=new Bullet(Arrow.type);
+			            bullet.x= Arrow.x;
+			            bullet.y= Arrow.y;   
+			            bullet.rotate = d;
+			            bullet.rotate1 = hd;
+			      	 	bulletArr.push(bullet);
+			      	 
+			 }
+			  	if(c_x>=1130&&c_x<=1180&&c_y>=700&&c_y<=750){
+			  		flags=true;
+			  		if(energy>=330){
+	   			   		energy=0;
+	   			   	}
+			  		 superM();
+			  	}
+			if(c_x>=710&&c_x<=740&&c_y>=763&&c_y<=793){
+				bulletArr=[];
+				pnum--;
+				if(pnum<=1){
+					pnum=1;
+				}
+				Arrow.type=pnum;
+			} 
+			if(c_x>=590&&c_x<=620&&c_y>=763&&c_y<=793){
+				bulletArr=[];
+				if(moneyNum>pnum*100){
+					pnum++;
+					if(pnum>7){
+						pnum=7;
+					}
+					if(moneyNum>0){
+						moneyNum-=pnum*100
+					}
+				
+				}
+				
+					Arrow.type=pnum;
+			} 
+				if(moneyNum>Arrow.type*2){
+				 moneyNum-=Arrow.type*2
+				}
+					if(moneyNum<Arrow.type*2){
+						bulletArr=[];
+					}
+		}
+	}
+
+		});
+	
+		
+	   </script>
+	</body>
+</html>
